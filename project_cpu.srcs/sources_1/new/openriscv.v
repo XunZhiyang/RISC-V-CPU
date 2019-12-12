@@ -16,7 +16,6 @@ module openmips(
 	wire[`InstAddrBus] id_pc_i;
 	wire[`InstBus] id_inst_i;
 	
-	//连接译码阶段ID模块的输出与ID/EX模块的输入
 	wire[`AluOpBus] id_aluop_o;
 	wire[`AluSelBus] id_alusel_o;
 	wire[`RegBus] id_reg1_o;
@@ -24,7 +23,6 @@ module openmips(
 	wire id_wreg_o;
 	wire[`RegAddrBus] id_wd_o;
 	
-	//连接ID/EX模块的输出与执行阶段EX模块的输入
 	wire[`AluOpBus] ex_aluop_i;
 	wire[`AluSelBus] ex_alusel_i;
 	wire[`RegBus] ex_reg1_i;
@@ -32,27 +30,22 @@ module openmips(
 	wire ex_wreg_i;
 	wire[`RegAddrBus] ex_wd_i;
 	
-	//连接执行阶段EX模块的输出与EX/MEM模块的输入
 	wire ex_wreg_o;
 	wire[`RegAddrBus] ex_wd_o;
 	wire[`RegBus] ex_wdata_o;
 
-	//连接EX/MEM模块的输出与访存阶段MEM模块的输入
 	wire mem_wreg_i;
 	wire[`RegAddrBus] mem_wd_i;
 	wire[`RegBus] mem_wdata_i;
 
-	//连接访存阶段MEM模块的输出与MEM/WB模块的输入
 	wire mem_wreg_o;
 	wire[`RegAddrBus] mem_wd_o;
 	wire[`RegBus] mem_wdata_o;
 	
-	//连接MEM/WB模块的输出与回写阶段的输入	
 	wire wb_wreg_i;
 	wire[`RegAddrBus] wb_wd_i;
 	wire[`RegBus] wb_wdata_i;
 	
-	//连接译码阶段ID模块与通用寄存器Regfile模块
   wire reg1_read;
   wire reg2_read;
   wire[`RegBus] reg1_data;
