@@ -7,8 +7,8 @@ module id(
     input wire[`RegBus] reg1_data_i,
     input wire[`RegBus] reg2_data_i,
 
-    output reg reg1_data_o,
-    output reg reg2_data_o,
+    output reg reg1_read_o,
+    output reg reg2_read_o,
     output reg[`RegAddrBus] reg1_addr_o,
     output reg[`RegAddrBus] reg2_addr_o,
 
@@ -21,11 +21,11 @@ module id(
     );
 
     wire[2:0] op = inst_i[14:12];
-    wire[11:0] iType_imm = inst_i[20:31]
-    wire[4:0] iType_rs1 = inst_i[19:15]
-    wire[4:0] iType_rd = inst_i[11:7]
+    wire[11:0] iType_imm = inst_i[20:31];
+    wire[4:0] iType_rs1 = inst_i[19:15];
+    wire[4:0] iType_rd = inst_i[11:7];
 
-    reg[`RegBus] imm
+    reg[`RegBus] imm;
 
     reg instvalid;
 
@@ -62,7 +62,7 @@ module id(
                     reg2_read_o <= 1'b0;
                     imm <= {{20{iType_imm[11]}}, iType_imm};
                     wd_o <= iType_rd;
-                    instvalid <= `Valid
+                    instvalid <= `Valid;
                 end
                 default: begin
                 end

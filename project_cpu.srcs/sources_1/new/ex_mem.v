@@ -14,10 +14,10 @@ module ex_mem (
     );
 
     always @ (posedge clk) begin
-        if (rst == `RstEnable) begin
+        if (rst == `Enable) begin
             mem_wd <= `NOPRegAddr;
             mem_wreg <= `Disable;
-            mem_wdata <= `ZeroWord
+            mem_wdata <= `ZeroWord;
         end else begin
             mem_wd <= ex_wd;
             mem_wreg <= ex_wreg;

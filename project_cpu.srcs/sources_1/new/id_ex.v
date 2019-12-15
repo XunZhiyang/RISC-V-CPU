@@ -7,7 +7,7 @@ module id_ex(
     input wire[`AluSelBus] id_alusel,
     input wire[`RegBus] id_reg1,
     input wire[`RegBus] id_reg2,
-    input wire['RegAddrBus] id_wd,
+    input wire[`RegAddrBus] id_wd,
     input wire id_wreg,
 
     output reg[`AluOpBus] ex_aluop,
@@ -23,9 +23,9 @@ module id_ex(
             ex_aluop <= `EXE_NOP_OP;
             ex_alusel <= `EXE_RES_NOP;
             ex_reg1 <= `ZeroWord;
-            ex_reg2 <= `Zeroword;
+            ex_reg2 <= `ZeroWord;
             ex_wd <= `NOPRegAddr;
-            ex_wreg <= `Disable
+            ex_wreg <= `Disable;
         end else begin
             ex_aluop <= id_aluop;
             ex_alusel <= id_alusel;

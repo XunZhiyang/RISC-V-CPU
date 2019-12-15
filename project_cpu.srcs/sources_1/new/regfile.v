@@ -30,7 +30,7 @@ module regfile(
         if (rst == `Enable) begin
             rdata1 <= `ZeroWord;
         end else if (raddr1 == `RegNumLog2'h0) begin
-            rdata1 <= `Zeroword;
+            rdata1 <= `ZeroWord;
         end else if ((raddr1 == waddr) && we == `Enable && (re1 == `Enable)) begin
             rdata1 <= wdata;
         end else if (re1 == `Enable) begin
@@ -44,7 +44,7 @@ module regfile(
         if (rst == `Enable) begin
             rdata2 <= `ZeroWord;
         end else if (raddr2 == `RegNumLog2'h0) begin
-            rdata2 <= `Zeroword;
+            rdata2 <= `ZeroWord;
         end else if ((raddr2 == waddr) && we == `Enable && (re1 == `Enable)) begin
             rdata2 <= wdata;
         end else if (re1 == `Enable) begin
