@@ -7,6 +7,8 @@
 `define Invalid 1'b1
 `define True 1'b1
 `define False 1'b0
+`define Stop 1'b1
+`define NoStop 1'b0
 
 `define EXE_ORI 6'b001101
 `define EXE_NOP 6'b000000
@@ -21,6 +23,7 @@
 
 `define InstAddrBus 31:0    //ROM address width
 `define InstBus 31:0        //ROM data width
+`define InstFetchBus 7:0
 `define InstMemNum 131071
 `define InstMemNumLog2 17
 
