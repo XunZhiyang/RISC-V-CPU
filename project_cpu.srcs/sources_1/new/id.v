@@ -20,7 +20,7 @@ module id(
     output reg[`RegAddrBus] reg1_addr_o,
     output reg[`RegAddrBus] reg2_addr_o,
 
-    output reg[`AluOpBus] aluop_o,
+    // output reg[`AluOpBus] aluop_o,
     output reg[`AluSelBus] alusel_o,
     output reg[`RegBus] reg1_o,
     output reg[`RegBus] reg2_o,
@@ -30,49 +30,98 @@ module id(
 
     );
 
-    wire[2:0] op = inst_i[14:12];
-    wire[11:0] iType_imm = inst_i[31:20];
+    // wire[`AluOpBus] op = inst_i[6:0];
+    // wire[11:0] iType_imm = inst_i[31:20];
     wire[4:0] iType_rs1 = inst_i[19:15];
-    wire[4:0] iType_rd = inst_i[11:7];
+    // wire[4:0] iType_rd = inst_i[11:7];
 
     reg[`RegBus] imm;
 
-    reg instvalid;
+    // reg instvalid;
 
     always @ (*) begin
         if (rst == `Enable) begin
-            aluop_o <= `EXE_NOP_OP;
-            alusel_o <= `EXE_RES_NOP;
+            // aluop_o <= `EXE_NOP_OP;
+            // alusel_o <= `EXE_RES_NOP;
             wd_o <= `NOPRegAddr;
             wreg_o <= `Disable;
-            instvalid <= `Valid;
+            // instvalid <= `Valid;
             reg1_read_o <= `Disable;
             reg2_read_o <= `Disable;
             reg1_addr_o <= `NOPRegAddr;
             reg2_addr_o <= `NOPRegAddr;
             imm <= `ZeroWord;
         end else begin
-            aluop_o <= `EXE_NOP_OP;
-            alusel_o <= `EXE_RES_NOP;
-            wd_o <= iType_rd;           // target register address
+            // aluop_o <= `EXE_NOP_OP;
+            // alusel_o <= `EXE_RES_NOP;
+            alusel_o <= inst_i[14:12]
+            wd_o <= inst_i[11:7];           // target register address
             wreg_o <= `Disable;
-            instvalid <= `Invalid;
+            // instvalid <= `Invalid;
             reg1_read_o <= `Disable;
             reg2_read_o <= `Disable;
-            reg1_addr_o <= iType_rs1;
-            reg2_addr_o <= iType_imm;
+            reg1_addr_o <= inst_i[19:15];
+            reg2_addr_o <= inst_i[24:20];
             imm <= `ZeroWord;
-
+            // aluop_o <= `
             case(op)
-                `EXE_ORI: begin 
+                `OP_ORI: begin 
                     wreg_o <= `Enable;
-                    aluop_o <= `EXE_OR_OP;
-                    alusel_o <= `EXE_RES_LOGIC;
                     reg1_read_o <= 1'b1;
                     reg2_read_o <= 1'b0;
-                    imm <= {{20{iType_imm[11]}}, iType_imm};
-                    wd_o <= iType_rd;
-                    instvalid <= `Valid;
+                    imm <= {{20{inst_i[31]}}, inst_i[31:20]};
+                    // wd_o <= iType_rd;
+                    // aluop_o <= `OP_ORI;
+                    // alusel_o <= `EXE_RES_LOGIC;
+                    // instvalid <= `Valid;
+                end
+                `OP_LOAD: begin
+                    wreg_o = `Enable;
+                    reg1_read_o <= 1'b1;
+                    reg2_read_o <= 1'b0;
+                    imm <= {{20{inst_i[31]}}, inst_i[31:20]};
+                end
+                `OP_STORE: begin
+                    wreg_o = `Disable;
+                    reg1_read_o <= 1'b1;
+                    reg2_read_o <= 1'b1;
+                    imm <= {{20{inst_i[31]}}, inst_i[31:25], inst_i[11:7]};
+                end
+                `OP_ADD: begin
+                    wreg_o = `Enable;
+                    reg1_read_o <= 1'b1;
+                    reg2_read_o <= 1'b1;
+                    imm <= 32'b0;
+                end
+                `OP_LUI: begin
+                    wreg_o = `Enable;
+                    reg1_read_o <= 1'b0;
+                    reg2_read_o <= 1'b0;
+                    imm <= {inst_i[31:12], 12'b0};
+                end
+                `OP_AUIPC: begin
+                    wreg_o = `Enable;
+                    reg1_read_o <= 1'b0;
+                    reg2_read_o <= 1'b0;
+                    imm <= {inst_i[31:12], 12'b0};
+                end
+                `OP_BRANCH: begin
+                    wreg_o = `Disable;
+                    reg1_read_o <= 1'b1;
+                    reg2_read_o <= 1'b1;
+                    imm <= {{20{inst_i[31]}}, inst_i[31:25], inst_i[11:7]};
+                end                
+                `OP_JAL: begin
+                    wreg_o = `Enable;
+                    reg1_read_o <= 1'b0;
+                    reg2_read_o <= 1'b0;
+                    imm <= {{12{inst_i[31]}}, inst_i[31:12]};
+                end
+                `OP_JALR: begin
+                    wreg_o <= `Enable;
+                    reg1_read_o <= 1'b1;
+                    reg2_read_o <= 1'b0;
+                    imm <= {{20{inst_i[31]}}, inst_i[31:20]};
                 end
                 default: begin
                 end

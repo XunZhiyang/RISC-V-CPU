@@ -3,7 +3,7 @@
 module ex(
     input wire rst,
 
-    input wire[`AluOpBus] aluop_i,
+    // input wire[`AluOpBus] aluop_i,
     input wire[`AluSelBus] alusel_i,
     input wire[`RegBus] reg1_i,
     input wire[`RegBus] reg2_i,
@@ -13,6 +13,17 @@ module ex(
     output reg[`RegAddrBus] wd_o,
     output reg wreg_o,
     output reg[`RegBus] wdata_o
+
+    // input wire[`RegAddrBus] reg1_addr_ex_i, 
+    // input wire[`RegAddrBus] reg2_addr_ex_i,
+
+    // input wire ex_wreg_i,               //data forwarding
+    // input wire[`RegBus] ex_wdata_i,
+    // input wire[`RegAddrBus] ex_wd_i,
+
+    // input wire mem_wreg_i,
+    // input wire[`RegBus] mem_wdata_i,
+    // input wire[`RegAddrBus] mem_wd_i,
     );
 
     reg[`RegBus] logicout;
@@ -24,7 +35,7 @@ module ex(
             // wreg_o <= `Disable;
             // wdata_o <= `ZeroWord;
         end else begin
-            case (aluop_i)
+            case (aluop_i)  
                 `EXE_OR_OP: begin
                     logicout <= reg1_i | reg2_i;
                 end

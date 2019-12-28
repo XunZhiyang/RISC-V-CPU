@@ -1,7 +1,7 @@
 `define Enable 1'b1
 `define Disable 1'b0
 `define ZeroWord 32'h00000000
-`define AluOpBus 7:0
+`define AluOpBus 6:0
 `define AluSelBus 2:0
 `define Valid 1'b0
 `define Invalid 1'b1
@@ -13,9 +13,17 @@
 `define EXE_ORI 6'b001101
 `define EXE_NOP 6'b000000
 
-//AluOp
-`define EXE_OR_OP 8'b00100101
-`define EXE_NOP_OP 8'b00000000
+//Opcode
+`define OP_ORI             7'b0010011 
+`define OP_LOAD            7'b0000011
+`define OP_STORE           7'b0100011
+`define OP_ADD             7'b0110011 
+`define OP_LUI             7'b0110111
+`define OP_AUIPC           7'b0010111
+`define OP_JAL             7'b1101111 
+`define OP_JALR            7'b1100111 
+`define OP_BRANCH          7'b1100011 
+`define OP_NOP             7'b0000000
 
 //AluSel
 `define EXE_RES_LOGIC 3'b001
