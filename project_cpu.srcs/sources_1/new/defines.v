@@ -30,6 +30,8 @@
 `define EXE_RES_NOP 3'b000
 
 `define InstAddrBus 31:0    //ROM address width
+`define AddrBus 31:0
+`define DataBus 31:0
 `define InstBus 31:0        //ROM data width
 `define InstFetchBus 7:0
 `define InstMemNum 131071
@@ -43,3 +45,12 @@
 `define RegNum 32
 `define RegNumLog2 5
 `define NOPRegAddr 5'b00000
+
+`define WAITING 2'b00
+`define READING 2'b01
+`define WRITING 2'b10
+`define IF 1'b0
+`define MEM 1'b1
+
+`define MemRead 1'b1
+`define MemWrite 1'b0
