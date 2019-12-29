@@ -1,5 +1,5 @@
 module iFetch(
-    input wire rst;
+    input wire rst,
 
     input wire[`InstAddrBus] pc,
     // input wire fetch;
@@ -7,9 +7,10 @@ module iFetch(
     input wire[`InstBus] read_inst_data,
 
     output reg stall,
-    output reg[`InstAddrBus] read_inst_addr
+    output reg reading,
+    output reg[`InstAddrBus] read_inst_addr,
 
-    output reg[`InstBus] inst_o,
+    output reg[`InstBus] inst_o
 );
 
     always @ (*) begin
@@ -17,16 +18,19 @@ module iFetch(
             stall <= `Disable;
             read_inst_addr <= `ZeroWord;
             inst_o <= `ZeroWord;
+            reading <= `Disable;
         end
         else if (read_inst_ok) begin
             stall <= `Disable;
             read_inst_addr <= `ZeroWord;
-            inst_o = read_inst_data;
+            inst_o <= read_inst_data;
+            reading <= `Disable;
         end
         else begin
             stall <= `Enable;
-            read_inst_addr <= pc;
+            read_inst_addr <= pc;   
             inst_o <= `ZeroWord;
+            reading <= `Enable;
         end
     end 
     // always @ (*) begin

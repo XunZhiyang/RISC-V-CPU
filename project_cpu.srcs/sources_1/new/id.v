@@ -20,7 +20,7 @@ module id(
     output reg[`RegAddrBus] reg1_addr_o,
     output reg[`RegAddrBus] reg2_addr_o,
 
-    // output reg[`AluOpBus] aluop_o,
+    output reg[`AluOpBus] aluop_o,
     output reg[`AluSelBus] alusel_o,
     output reg[`RegBus] reg1_o,
     output reg[`RegBus] reg2_o,
@@ -30,7 +30,7 @@ module id(
 
     );
 
-    // wire[`AluOpBus] op = inst_i[6:0];
+    wire[`AluOpBus] op = inst_i[6:0];
     // wire[11:0] iType_imm = inst_i[31:20];
     wire[4:0] iType_rs1 = inst_i[19:15];
     // wire[4:0] iType_rd = inst_i[11:7];
@@ -41,8 +41,8 @@ module id(
 
     always @ (*) begin
         if (rst == `Enable) begin
-            // aluop_o <= `EXE_NOP_OP;
-            // alusel_o <= `EXE_RES_NOP;
+            aluop_o <= `OP_NOP;
+            alusel_o <= `EXE_RES_NOP;
             wd_o <= `NOPRegAddr;
             wreg_o <= `Disable;
             // instvalid <= `Valid;
@@ -52,9 +52,9 @@ module id(
             reg2_addr_o <= `NOPRegAddr;
             imm <= `ZeroWord;
         end else begin
-            // aluop_o <= `EXE_NOP_OP;
+            aluop_o <= op;
             // alusel_o <= `EXE_RES_NOP;
-            alusel_o <= inst_i[14:12]
+            alusel_o <= inst_i[14:12];
             wd_o <= inst_i[11:7];           // target register address
             wreg_o <= `Disable;
             // instvalid <= `Invalid;

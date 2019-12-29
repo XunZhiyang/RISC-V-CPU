@@ -3,7 +3,7 @@
 module ex(
     input wire rst,
 
-    // input wire[`AluOpBus] aluop_i,
+    input wire[`AluOpBus] aluop_i,
     input wire[`AluSelBus] alusel_i,
     input wire[`RegBus] reg1_i,
     input wire[`RegBus] reg2_i,
@@ -36,7 +36,7 @@ module ex(
             // wdata_o <= `ZeroWord;
         end else begin
             case (aluop_i)  
-                `EXE_OR_OP: begin
+                `OP_ORI: begin
                     logicout <= reg1_i | reg2_i;
                 end
                 default: begin

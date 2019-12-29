@@ -12,13 +12,14 @@ module mem_ctrl(
     input wire op_rw,
     input wire[2:0] op_num,
     input wire[`DataBus] write_content,
+    input wire[7:0] mem_return,
 
     output reg read_inst_ok,
     output reg op_data_ok,
 
     output reg ram_rw,
     output reg[`AddrBus] address_o,
-    output reg[`DataBus] write_ram_o,
+    output reg[7:0] write_ram_o,
  
     output reg[`DataBus] result_o
 );
@@ -34,11 +35,13 @@ module mem_ctrl(
             read_inst_ok <= 1'b0;
             op_data_ok <= 1'b0;
         end
-        else if (!rdy) begin
-        end
+//        else if (!rdy) begin
+//        end
         else begin
             case (state)
                 `WAITING: begin
+                    read_inst_ok <= 1'b0;
+                    op_data_ok <= 1'b0;
                     if (op_data_i) begin
                         ram_rw <= op_rw;
                         address_o <= op_data_addr;
@@ -61,22 +64,22 @@ module mem_ctrl(
                         channel <= 1'b0;
                     end
                 end
-                `READING: begin00
+                `READING: begin
                     cnt <= cnt + 1;
                     if (cnt < byte_num - 1) begin
                         address_o <= address_o + 1;
-                     end
+                    end
                     if (cnt == 1) begin
-                        result_o[7:0] <= data_from_mem;
+                        result_o[7:0] <= mem_return;
                     end
                     else if (cnt == 2) begin
-                        result_o[15:8] <= data_from_mem;
+                        result_o[15:8] <= mem_return;
                     end
                     else if (cnt == 3) begin
-                        result_o[23:16] <= data_from_mem;
+                        result_o[23:16] <= mem_return;
                     end
                     else if (cnt == 4) begin
-                        result_o[31:24] <= data_from_mem;
+                        result_o[31:24] <= mem_return;
                     end
 
                     if (cnt == byte_num) begin

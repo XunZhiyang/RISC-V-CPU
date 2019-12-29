@@ -31,6 +31,8 @@ module cpu(
 	wire[`InstAddrBus] pc;
 	wire[`InstAddrBus] id_pc_i;
 	wire[`InstBus] id_inst_i;
+
+	wire[`InstBus] inst;
 	
 	wire[`AluOpBus] id_aluop_o;
 	wire[`AluSelBus] id_alusel_o;
@@ -62,27 +64,75 @@ module cpu(
 	wire[`RegAddrBus] wb_wd_i;
 	wire[`RegBus] wb_wdata_i;
 	
-  wire reg1_read;
-  wire reg2_read;
-  wire[`RegBus] reg1_data;
-  wire[`RegBus] reg2_data;
-  wire[`RegAddrBus] reg1_addr;
-  wire[`RegAddrBus] reg2_addr;
+	wire reg1_read;
+	wire reg2_read;
+	wire[`RegBus] reg1_data;
+	wire[`RegBus] reg2_data;
+	wire[`RegAddrBus] reg1_addr;
+	wire[`RegAddrBus] reg2_addr;
+
+	wire[`CtrlBus] stall_ctrl;
+	wire stall_if;
+
+    wire read_inst;
+    wire[`AddrBus] read_inst_addr;
+    wire op_data;
+    wire[`AddrBus] op_data_addr;
+    wire op_rw;
+    wire[2:0] op_num;
+    wire[`DataBus] write_content;
+    wire read_inst_ok;
+    wire op_data_ok;
+    wire ram_rw;
+    wire[`AddrBus] address_o;
+    wire[`DataBus] write_ram_o;
+    wire[`DataBus] mem_result;
   
 	pc_reg pc_reg0(
 		.clk(clk_in),
 		.rst(rst_in),
-		.pc(pc),
+		.stall(stall_ctrl),
+		.pc(pc)
 		// .wr(mem_wr)	
 	);
 	
-  assign mem_a = pc;
+
+	iFetch iFetch0(
+		.rst(rst_in),
+		.pc(pc),
+		.read_inst_ok(read_inst_ok),
+		.read_inst_data(mem_result),
+		.stall(stall_if),
+		.read_inst_addr(read_inst_addr),
+		.inst_o(inst),
+		.reading(read_inst)
+	);
+
+	mem_ctrl mem_ctrl0(
+		.clk(clk_in),
+		.rst(rst_in),
+		.read_inst_i(read_inst),
+		.read_inst_addr(read_inst_addr),
+		.op_data_i(op_data),
+		.op_data_addr(op_data_addr),
+		.op_rw(op_rw),
+		.op_num(op_num),
+		.write_content(write_content),
+		.mem_return(mem_din),
+		.read_inst_ok(read_inst_ok),
+		.op_data_ok(op_data_ok),
+		.ram_rw(mem_wr),
+		.address_o(mem_a),
+		.write_ram_o(mem_dout),
+		.result_o(mem_result)
+
+	);
 
 	if_id if_id0(
 		.clk(clk_in),
 		.rst(rst_in),
 		.if_pc(pc),
-		.if_inst(mem_din),
+		.if_inst(inst),
 		.id_pc(id_pc_i),
 		.id_inst(id_inst_i)      	
 	);
@@ -95,6 +145,14 @@ module cpu(
 		.reg1_data_i(reg1_data),
 		.reg2_data_i(reg2_data),
 
+		.ex_wreg_i(ex_wreg_o),
+		.ex_wdata_i(ex_wdata_o),
+		.ex_wd_i(ex_wd_o),
+		
+		.mem_wreg_i(mem_wreg_o),
+		.mem_wdata_i(mem_wdata_o),
+		.mem_wd_i(mem_wd_o),
+
 		.reg1_read_o(reg1_read),
 		.reg2_read_o(reg2_read), 	  
 
@@ -106,15 +164,7 @@ module cpu(
 		.reg1_o(id_reg1_o),
 		.reg2_o(id_reg2_o),
 		.wd_o(id_wd_o),
-		.wreg_o(id_wreg_o),
-
-		.ex_wreg_i(ex_wd_o),
-		.ex_wdata_i(ex_wreg_o),
-		.ex_wd_i(ex_wdata_o),
-		
-		.mem_wreg_i(mem_wd_o),
-		.mem_wdata_i(mem_wreg_o),
-		.mem_wd_i(mem_wdata_o)
+		.wreg_o(id_wreg_o)
 
 	);
 
@@ -170,7 +220,7 @@ module cpu(
   ex_mem ex_mem0(
 		.clk(clk_in),
 		.rst(rst_in),
-	  
+
 		.ex_wd(ex_wd_o),
 		.ex_wreg(ex_wreg_o),
 		.ex_wdata(ex_wdata_o),
@@ -189,10 +239,18 @@ module cpu(
 		.wd_i(mem_wd_i),
 		.wreg_i(mem_wreg_i),
 		.wdata_i(mem_wdata_i),
+		.mem_result(mem_result),
 	  
 		.wd_o(mem_wd_o),
 		.wreg_o(mem_wreg_o),
-		.wdata_o(mem_wdata_o)
+		.wdata_o(mem_wdata_o),
+
+		.op_data_o(op_data),
+		.op_data_addr(op_data_addr),
+
+		.op_rw(op_rw),
+		.op_num(op_num),
+		.write_content(write_content)
 	);
 
 	mem_wb mem_wb0(

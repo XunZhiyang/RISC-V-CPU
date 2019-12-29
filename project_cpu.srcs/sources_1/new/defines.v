@@ -10,8 +10,8 @@
 `define Stop 1'b1
 `define NoStop 1'b0
 
-`define EXE_ORI 6'b001101
-`define EXE_NOP 6'b000000
+// `define EXE_ORI 6'b001101
+// `define EXE_NOP 6'b000000
 
 //Opcode
 `define OP_ORI             7'b0010011 
@@ -32,6 +32,7 @@
 `define InstAddrBus 31:0    //ROM address width
 `define AddrBus 31:0
 `define DataBus 31:0
+`define CtrlBus 5:0
 `define InstBus 31:0        //ROM data width
 `define InstFetchBus 7:0
 `define InstMemNum 131071
