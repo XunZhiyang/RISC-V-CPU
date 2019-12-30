@@ -34,14 +34,18 @@ module mem_ctrl(
             state <= `WAITING;
             read_inst_ok <= 1'b0;
             op_data_ok <= 1'b0;
+            cnt <= 0;
         end
 //        else if (!rdy) begin
 //        end
         else begin
             case (state)
                 `WAITING: begin
+                    cnt <= 0;
                     read_inst_ok <= 1'b0;
                     op_data_ok <= 1'b0;
+                    address_o <= 4'h0;
+                    result_o <= 4'h0;
                     if (op_data_i) begin
                         ram_rw <= op_rw;
                         address_o <= op_data_addr;
@@ -59,7 +63,7 @@ module mem_ctrl(
                     else if (read_inst_i) begin
                         ram_rw <= `MemRead;
                         address_o <= read_inst_addr;
-                        byte_num <= 3'b1;
+                        byte_num <= 3'b100;
                         state <= `READING;
                         channel <= 1'b0;
                     end
@@ -88,8 +92,9 @@ module mem_ctrl(
                             op_data_ok <= 1'b1;
                         end 
                         else begin
-                            read_inst_ok <= 1'b0;
+                            read_inst_ok <= 1'b1;
                         end
+                        // cnt <= 0;
                     end
                 end
                 `WRITING: begin
@@ -111,9 +116,9 @@ module mem_ctrl(
                     if (cnt == byte_num - 2) begin
                         state <= `WAITING;
                         op_data_ok <= 1'b1;
+                        // cnt <= 0;
                     end
                 end
-                default: ;
             endcase
         end
     end

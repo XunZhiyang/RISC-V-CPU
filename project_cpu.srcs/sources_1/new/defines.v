@@ -20,10 +20,42 @@
 `define OP_ADD             7'b0110011 
 `define OP_LUI             7'b0110111
 `define OP_AUIPC           7'b0010111
+`define OP_BRANCH          7'b1100011 
 `define OP_JAL             7'b1101111 
 `define OP_JALR            7'b1100111 
-`define OP_BRANCH          7'b1100011 
 `define OP_NOP             7'b0000000
+
+`define SEL_ADD             5'b00000
+`define SEL_SUB             5'b00000
+`define SEL_SLL             5'b00001
+`define SEL_SLT             5'b00010
+`define SEL_SLTU            5'b00011
+`define SEL_XOR             5'b00100
+`define SEL_SRL             5'b00101
+`define SEL_SRA             5'b00101
+`define SEL_OR              5'b00110
+`define SEL_AND             5'b00111
+
+`define SEL_LUI             5'b01100
+`define SEL_AUIPC           5'b01001
+`define SEL_JAL             5'b01010
+`define SEL_JALR            5'b01011
+
+`define SEL_BEQ             5'b10000
+`define SEL_BNE             5'b10001
+`define SEL_BLT             5'b10100
+`define SEL_BGE             5'b10101
+`define SEL_BLTU            5'b10110
+`define SEL_BGEU            5'b10111
+
+`define SEL_LB              5'b11000
+`define SEL_LH              5'b11001
+`define SEL_LW              5'b11010
+`define SEL_LBU             5'b11100
+`define SEL_LHU             5'b11101
+`define SEL_SB              5'b11111
+`define SEL_SH              5'b11110
+`define SEL_SW              5'b11011
 
 //AluSel
 `define EXE_RES_LOGIC 3'b001
@@ -53,5 +85,5 @@
 `define IF 1'b0
 `define MEM 1'b1
 
-`define MemRead 1'b1
-`define MemWrite 1'b0
+`define MemRead 1'b0
+`define MemWrite 1'b1

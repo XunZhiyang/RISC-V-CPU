@@ -108,6 +108,14 @@ module cpu(
 		.reading(read_inst)
 	);
 
+	ctrl ctrl0(
+		.rst(rst_in),
+		.stallreq_from_if(stall_if),
+		.stallreq_from_id(`Disable),
+		.stallreq_from_ex(`Disable),
+		.stall(stall_ctrl)
+	);
+
 	mem_ctrl mem_ctrl0(
 		.clk(clk_in),
 		.rst(rst_in),
