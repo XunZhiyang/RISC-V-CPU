@@ -12,6 +12,7 @@ module id(
     input wire ex_wreg_i,
     input wire[`RegBus] ex_wdata_i,
     input wire[`RegAddrBus] ex_wd_i,
+    input wire[2:0] ex_byte_num,
 
     input wire mem_wreg_i,
     input wire[`RegBus] mem_wdata_i,
@@ -28,16 +29,15 @@ module id(
     output reg[`RegBus] reg2_o,
     output reg[`RegAddrBus] wd_o,
     output reg wreg_o,
-    output reg[`RegBus] imm;
+    output reg[`RegBus] imm,
 
-    output reg func7;
+    output reg func7,
 
     output reg id_stall,
     output reg[`InstAddrBus] pc_o
 
     );
 
-    assign pc_o = pc_i;
 
     wire[`AluOpBus] op = inst_i[6:0];
     // wire[11:0] iType_imm = inst_i[31:20];
@@ -49,6 +49,7 @@ module id(
 
     always @ (*) begin
         if (rst == `Enable || branch_interception == `Enable) begin
+            pc_o <= `ZeroWord;
             aluop_o <= `OP_NOP;
             alusel_o <= `EXE_RES_NOP;
             wd_o <= `NOPRegAddr;
@@ -59,9 +60,10 @@ module id(
             reg2_addr_o <= `NOPRegAddr;
             imm <= `ZeroWord;
         end else begin
+            pc_o <= pc_i;
             aluop_o <= op;
-            alusel_o <= inst_i[14:12];
-            wd_o[2:0] <= inst_i[11:7];           // target register address
+            alusel_o[2:0] <= inst_i[14:12];
+            wd_o <= inst_i[11:7];           // target register address
             wreg_o <= `Disable;
             reg1_read_o <= `Disable;
             reg2_read_o <= `Disable;
@@ -90,54 +92,55 @@ module id(
                     reg2_read_o <= 1'b1;
                     imm <= {{20{inst_i[31]}}, inst_i[31:25], inst_i[11:7]};
                     case(inst_i[14:12])
-                        `3'b000: begin
+                        3'b000: begin
                             alusel_o <= `SEL_SB;
                         end
-                        `3'b001: begin
+                        3'b001: begin
                             alusel_o <= `SEL_SH;
                         end
-                        `3'b010: begin
+                        3'b010: begin
                             alusel_o <= `SEL_SW;
                         end
                     endcase
                 end
                 `OP_ADD: begin
-                    alusel_o[4:3] = 2'b00;
-                    wreg_o = `Enable;
+                    alusel_o[4:3] <= 2'b00;
+                    wreg_o <= `Enable;
                     reg1_read_o <= 1'b1;
                     reg2_read_o <= 1'b1;
                     imm <= 32'b0;
                 end
                 `OP_LUI: begin
                     alusel_o <= `SEL_LUI;
-                    wreg_o = `Enable;
+                    wreg_o <= `Enable;
                     reg1_read_o <= 1'b0;
                     reg2_read_o <= 1'b0;
                     imm <= {inst_i[31:12], 12'b0};
                 end
                 `OP_AUIPC: begin
                     alusel_o <= `SEL_AUIPC;
-                    wreg_o = `Enable;
+                    wreg_o <= `Enable;
                     reg1_read_o <= 1'b0;
                     reg2_read_o <= 1'b0;
                     imm <= {inst_i[31:12], 12'b0};
                 end
                 `OP_BRANCH: begin
-                    alusel_o[4:3] = 2'b00;
-                    wreg_o = `Disable;
+                    alusel_o[4:3] <= 2'b00;
+                    wreg_o <= `Disable;
                     reg1_read_o <= 1'b1;
                     reg2_read_o <= 1'b1;
                     imm <= {{20{inst_i[31]}}, inst_i[31:25], inst_i[11:7]};
                 end                
                 `OP_JAL: begin
-                    alusel_o = `SEL_JAL;
-                    wreg_o = `Enable;
+                    $display("i get in JAL_OP in id stage now,    %h, %h", pc_i, `SEL_JAL);
+                    alusel_o <= `SEL_JAL;
+                    wreg_o <= `Enable;
                     reg1_read_o <= 1'b0;
                     reg2_read_o <= 1'b0;
-                    imm <= {{12{inst_i[31]}}, inst_i[31:12]};
+                    imm <= {{12{inst_i[31]}}, inst_i[19:12], inst_i[20], inst_i[30:21], 1'b0};
                 end
                 `OP_JALR: begin
-                    alusel_o = `SEL_JALR;
+                    alusel_o <= `SEL_JALR;
                     wreg_o <= `Enable;
                     reg1_read_o <= 1'b1;
                     reg2_read_o <= 1'b0;
@@ -153,7 +156,7 @@ module id(
         if (rst == `Enable) begin
             reg1_o <= `ZeroWord;
         end else if ((reg1_read_o == 1'b1) && (ex_wd_i == reg1_addr_o)
-                      && ex_wreg_i && ex_memop) begin
+                      && ex_wreg_i && ex_byte_num) begin
             id_stall <= 1'b1;
         end else if ((reg1_read_o == 1'b1) && (ex_wreg_i == 1'b1) 
                       && (ex_wd_i == reg1_addr_o)) begin
@@ -174,7 +177,7 @@ module id(
         if (rst == `Enable) begin
             reg2_o <= `ZeroWord;
         end else if ((reg1_read_o == 1'b1) && (ex_wd_i == reg1_addr_o)
-                      && ex_wreg_i && ex_memop) begin
+                      && ex_wreg_i && ex_byte_num) begin
             id_stall <= 1'b1;
         end else if ((reg2_read_o == 1'b1) && (ex_wreg_i == 1'b1) 
                       && (ex_wd_i == reg2_addr_o)) begin

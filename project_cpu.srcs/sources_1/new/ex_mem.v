@@ -4,6 +4,7 @@ module ex_mem (
     input wire clk,
     input wire rst,
     input wire[`InstAddrBus] pc_i,
+    input wire[`CtrlBus] stall,
 
     input wire[`RegAddrBus] ex_wd,
     input wire ex_wreg,

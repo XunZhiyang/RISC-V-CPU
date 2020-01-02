@@ -14,6 +14,8 @@ module mem_ctrl(
     input wire[`DataBus] write_content,
     input wire[7:0] mem_return,
 
+    input wire br,
+
     output reg read_inst_ok,
     output reg op_data_ok,
 
@@ -30,14 +32,12 @@ module mem_ctrl(
     reg[2:0] byte_num;
 
     always @ (posedge clk) begin
-        if (rst == `Enable) begin
+        if (rst == `Enable || (br && channel == 1'b0)) begin
             state <= `WAITING;
             read_inst_ok <= 1'b0;
             op_data_ok <= 1'b0;
             cnt <= 0;
         end
-//        else if (!rdy) begin
-//        end
         else begin
             case (state)
                 `WAITING: begin
@@ -56,7 +56,7 @@ module mem_ctrl(
                         else begin
                             state <= `WRITING;
                             write_ram_o <= write_content[7:0];
-                            address_o <= address_o + 1;  //to be cautious!!!!!!!!!!!
+                            // address_o <= address_o + 1;  //to be cautious!!!!!!!!!!!
                         end
                         channel <= 1'b1;
                     end
@@ -112,8 +112,11 @@ module mem_ctrl(
                         write_ram_o <= write_content[31:24];
                     end
                 
-                    address_o <= address_o + 1;
-                    if (cnt == byte_num - 2) begin
+                    if (cnt + 2 <= byte_num)
+                        address_o <= address_o + 1;
+                    else
+                        address_o <= 32'b0;
+                    if (cnt + 2 >= byte_num) begin
                         state <= `WAITING;
                         op_data_ok <= 1'b1;
                         // cnt <= 0;

@@ -2,7 +2,7 @@
 `define Disable 1'b0
 `define ZeroWord 32'h00000000
 `define AluOpBus 6:0
-`define AluSelBus 2:0
+`define AluSelBus 4:0
 `define Valid 1'b0
 `define Invalid 1'b1
 `define True 1'b1

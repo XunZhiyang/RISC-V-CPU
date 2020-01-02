@@ -10,6 +10,7 @@ module pc_reg(
     // output reg wr  //0 for read 1 for write
     );
     always @ (posedge clk) begin
+        // $display("WOWOWOWOW");
         if (rst == `Enable) begin
             pc <= 32'h0;
         end else if (br) begin

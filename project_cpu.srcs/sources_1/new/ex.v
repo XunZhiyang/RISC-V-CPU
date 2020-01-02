@@ -18,7 +18,7 @@ module ex(
     output reg wreg_o,
     output reg[`RegBus] wdata_o,
 
-    output reg[`InstAddrBus] pc_o
+    output reg[`InstAddrBus] pc_o,
 
     output reg br,
     output reg[`InstBus] npc,
@@ -42,16 +42,17 @@ module ex(
 
     // reg[`RegBus] wdata_o;
 
-    assign pc_o = pc_i;
 
     always @ (*) begin
         if (rst == `Enable) begin
+            pc_o <= `ZeroWord;
             br <= 1'b0;
-            wd_o <= NOPRegAddr;     //wht not in pdf
+            wd_o <= `NOPRegAddr;     //wht not in pdf
             wreg_o <= `Disable;
             byte_num_o <= 2'b00;
             wdata_o <= `ZeroWord;
         end else begin
+            pc_o <= pc_i;
             br <= 1'b0;
             wd_o <= wd_i;
             wreg_o <= wreg_i;
@@ -96,6 +97,7 @@ module ex(
                     wdata_o <= reg1_i + pc_i;
                 end
                 `SEL_JAL: begin
+                    $display("i'm in SEL_JAL");
                     wdata_o <= pc_i + 4;
                     npc <= reg1_i + pc_i;
                     br <= 1'b1;
@@ -150,50 +152,50 @@ module ex(
                 `SEL_LB: begin
                     mem_data_addr <= reg1_i + reg2_i;
                     mem_rw <= `MemRead;
-                    byte_num_o <= 2'b01;
+                    byte_num_o <= 3'b001;
                     sign_o <= 1;
                 end
                 `SEL_LH: begin
                     mem_data_addr <= reg1_i + reg2_i;
                     mem_rw <= `MemRead;
-                    byte_num_o <= 2'b10;
+                    byte_num_o <= 3'b010;
                     sign_o <= 1;
                 end
                 `SEL_LW: begin
                     mem_data_addr <= reg1_i + reg2_i;
                     mem_rw <= `MemRead;
-                    byte_num_o <= 2'b11;
+                    byte_num_o <= 3'b100;
                     sign_o <= 1;
                 end
                 `SEL_LBU: begin
                     mem_data_addr <= reg1_i + reg2_i;
                     mem_rw <= `MemRead;
-                    byte_num_o <= 2'b01;
+                    byte_num_o <= 3'b001;
                     sign_o <= 0;
                 end
                 `SEL_LHU: begin
                     mem_data_addr <= reg1_i + reg2_i;
                     mem_rw <= `MemRead;
-                    byte_num_o <= 2'b10;
+                    byte_num_o <= 3'b010;
                     sign_o <= 0;
                 end
                 `SEL_SB: begin
                     wdata_o <= reg2_i;
-                    mem_data_addr <= reg1_i + opr3_i;
+                    mem_data_addr <= reg1_i + imm;
                     mem_rw <= `MemWrite;
-                    byte_num_o <= 2'b01;
+                    byte_num_o <= 3'b001;
                 end
                 `SEL_SH: begin
                     wdata_o <= reg2_i;
-                    mem_data_addr <= reg1_i + opr3_i;
+                    mem_data_addr <= reg1_i + imm;
                     mem_rw <= `MemWrite;
-                    byte_num_o <= 2'b10;
+                    byte_num_o <= 3'b010;
                 end
                 `SEL_SW: begin
                     wdata_o <= reg2_i;
-                    mem_data_addr <= reg1_i + opr3_i;
+                    mem_data_addr <= reg1_i + imm;
                     mem_rw <= `MemWrite;
-                    byte_num_o <= 2'b11;
+                    byte_num_o <= 3'b100;
                 end
             endcase
         end

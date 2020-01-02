@@ -2,6 +2,7 @@
 module if_id(
     input wire clk,
     input wire rst,
+    input wire[`CtrlBus] stall,
     
     input wire[`InstAddrBus] if_pc,
     input wire[`InstBus] if_inst,
@@ -16,7 +17,7 @@ module if_id(
         if (rst == `Enable || br || (stall[1] == `Enable && stall[2] == `Disable)) begin
             id_pc = `ZeroWord;
             id_inst <=`ZeroWord;
-        end else begin
+        end else if (stall[1] == `Disable) begin
             id_pc <= if_pc;
             id_inst <= if_inst;
         end

@@ -28,44 +28,47 @@ module mem(
 
     output reg[`InstAddrBus] pc_o,
 
-    output mem_stall
+    output reg mem_stall
 
     );
 
-    assign pc_o = pc_i;
 
     always @ (*) begin  // considering reset here is unnecessary
         if (rst) begin
+            pc_o <= `ZeroWord;
             mem_stall <= `Disable;
             wreg_o <= `Disable;
             op_num <= 0;
             op_data_o <= `Disable;
         end
-        else if (mem_byte_num) begin
-            if (op_data_ok) begin
+        else begin
+            pc_o <= pc_i;
+            if (mem_byte_num) begin
+                if (op_data_ok) begin
+                    mem_stall <= `Disable;
+                    op_data_o <= `Disable;
+                    // wdata_o <= mem_result;
+                    wreg_o <= wreg_i;
+                    wd_o <= wd_i;
+                    if (mem_sign) wdata_o <= $signed(mem_result);
+                    else wdata_o <= mem_result;
+                    // wdata_o <= wdata_i;
+                    // op_data_addr <= `ZeroWord;
+                end else begin
+                    mem_stall <= `Enable;
+                    op_data_o <= `Enable;
+                    op_data_addr <= mem_data_addr;
+                    op_rw <= mem_rw;
+                    op_num <= mem_byte_num;
+                    write_content <= wdata_i;
+                end
+            end else begin 
                 mem_stall <= `Disable;
                 op_data_o <= `Disable;
-                // wdata_o <= mem_result;
-                wreg_o <= wreg_i;
                 wd_o <= wd_i;
-                if (mem_sign) wdata_o <= $signed(mem_result);
-                else wdata_o <= mem_result;
-                // wdata_o <= wdata_i;
-                // op_data_addr <= `ZeroWord;
-            end else begin
-                mem_stall <= `Enable;
-                op_data_o <= `Enable;
-                op_data_addr <= mem_data_addr;
-                op_rw <= mem_rw;
-                op_num <= mem_byte_num;
-                write_content <= wdata_i;
+                wreg_o <= wreg_i;
+                wdata_o <= wdata_i;
             end
-        end else begin 
-            mem_stall <= `Disable;
-            op_data_o <= `Disable;
-            wd_o <= wd_i;
-            wreg_o <= wreg_i;
-            wdata_o <= wdata_i;
         end
     end
 endmodule
