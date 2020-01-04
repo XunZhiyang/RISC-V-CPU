@@ -23,20 +23,50 @@ module mem_ctrl(
     output reg[`AddrBus] address_o,
     output reg[7:0] write_ram_o,
  
-    output reg[`DataBus] result_o
+    output reg[`DataBus] result_o,
+    output reg[1:0] state,
+
+    output reg[`RegAddrBus] wd_back,
+    output reg wreg_back,
+    output reg signed_back,
+    output reg[2:0] op_num_back,
+    input wire[`RegAddrBus] wd_mem,
+    input wire wreg_mem,
+    input wire signed_mem
 );
-    reg[1:0] state;
     reg channel;  //1 for data 0 for inst
-    reg mem_rw;
     reg[2:0] cnt;
     reg[2:0] byte_num;
+
+    reg[`RegAddrBus] wd_back_buffer;
+    reg wreg_back_buffer;
+    reg signed_back_buffer;
+    reg[2:0] op_num_back_buffer;
+
+    reg[`DataBus] save_write_content;
 
     always @ (posedge clk) begin
         if (rst == `Enable || (br && channel == 1'b0)) begin
             state <= `WAITING;
             read_inst_ok <= 1'b0;
             op_data_ok <= 1'b0;
+            ram_rw <= `MemRead;
+            address_o <= 0;
+            write_ram_o <= 0;
+            result_o <= 0;
+
+            channel <= 0;
             cnt <= 0;
+            byte_num <= 0;
+            wd_back_buffer <= 0;
+            wreg_back_buffer <= 0;
+            signed_back_buffer <= 0;
+            op_num_back_buffer <= 0;
+            wd_back <= 0;
+            wreg_back <= 0;
+            signed_back <= 0;
+            op_num_back <= 0;
+            save_write_content <= 0;
         end
         else begin
             case (state)
@@ -46,7 +76,12 @@ module mem_ctrl(
                     op_data_ok <= 1'b0;
                     address_o <= 4'h0;
                     result_o <= 4'h0;
+                    save_write_content <= 0;
                     if (op_data_i) begin
+                        wd_back_buffer <= wd_mem;
+                        wreg_back_buffer <= wreg_mem;
+                        signed_back_buffer <= signed_mem;
+                        op_num_back_buffer <= op_num;
                         ram_rw <= op_rw;
                         address_o <= op_data_addr;
                         byte_num <= op_num;
@@ -56,6 +91,7 @@ module mem_ctrl(
                         else begin
                             state <= `WRITING;
                             write_ram_o <= write_content[7:0];
+                            save_write_content <= write_content;
                             // address_o <= address_o + 1;  //to be cautious!!!!!!!!!!!
                         end
                         channel <= 1'b1;
@@ -88,8 +124,13 @@ module mem_ctrl(
 
                     if (cnt == byte_num) begin
                         state <= `WAITING;
+                        address_o <= 0;
                         if (channel == 1'b1) begin
                             op_data_ok <= 1'b1;
+                            wd_back <= wd_back_buffer;
+                            wreg_back <= wreg_back_buffer;
+                            signed_back <= signed_back_buffer;
+                            op_num_back <= op_num_back_buffer;
                         end 
                         else begin
                             read_inst_ok <= 1'b1;
@@ -103,13 +144,13 @@ module mem_ctrl(
                     //     address_o <= address_o + 1;
                     //  end
                     if (cnt == 0) begin
-                        write_ram_o <= write_content[15:8];
+                        write_ram_o <= save_write_content[15:8];
                     end
                     else if (cnt == 1) begin
-                        write_ram_o <= write_content[23:16];
+                        write_ram_o <= save_write_content[23:16];
                     end
                     else if (cnt == 2) begin
-                        write_ram_o <= write_content[31:24];
+                        write_ram_o <= save_write_content[31:24];
                     end
                 
                     if (cnt + 2 <= byte_num)
@@ -119,6 +160,10 @@ module mem_ctrl(
                     if (cnt + 2 >= byte_num) begin
                         state <= `WAITING;
                         op_data_ok <= 1'b1;
+                        wd_back <= wd_back_buffer;
+                        wreg_back <= wreg_back_buffer;
+                        signed_back <= signed_back_buffer;
+                        op_num_back <= op_num_back_buffer;
                         // cnt <= 0;
                     end
                 end

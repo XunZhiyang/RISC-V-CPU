@@ -28,29 +28,29 @@ module regfile(
 
     always @ (*) begin
         if (rst == `Enable) begin
-            rdata1 <= `ZeroWord;
+            rdata1 = `ZeroWord;
         end else if (raddr1 == `RegNumLog2'h0) begin
-            rdata1 <= `ZeroWord;
+            rdata1 = `ZeroWord;
         end else if ((raddr1 == waddr) && we == `Enable && (re1 == `Enable)) begin
-            rdata1 <= wdata;
+            rdata1 = wdata;
         end else if (re1 == `Enable) begin
-            rdata1 <= regs[raddr1];
+            rdata1 = regs[raddr1];
         end else begin
-            rdata1 <= `ZeroWord;
+            rdata1 = `ZeroWord;
         end
     end
 
     always @ (*) begin
         if (rst == `Enable) begin
-            rdata2 <= `ZeroWord;
+            rdata2 = `ZeroWord;
         end else if (raddr2 == `RegNumLog2'h0) begin
-            rdata2 <= `ZeroWord;
+            rdata2 = `ZeroWord;
         end else if ((raddr2 == waddr) && we == `Enable && (re1 == `Enable)) begin
-            rdata2 <= wdata;
+            rdata2 = wdata;
         end else if (re1 == `Enable) begin
-            rdata2 <= regs[raddr2];
+            rdata2 = regs[raddr2];
         end else begin
-            rdata2 <= `ZeroWord;
+            rdata2 = `ZeroWord;
         end
     end
 endmodule

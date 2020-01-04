@@ -9,17 +9,17 @@ module ctrl(
 
     always @ (*) begin
         if (rst == `Enable) begin
-            stall <= 6'b000000;
+            stall = 6'b000000;
         end else if (stallreq_from_mem == `Enable) begin
-            stall <= 6'b011111;
+            stall = 6'b011111;
         end else if (stallreq_from_ex == `Enable) begin
-            stall <= 6'b001111;
+            stall = 6'b001111;
         end else if (stallreq_from_id == `Enable) begin
-            stall <= 6'b000111;
+            stall = 6'b000111;
         end else if (stallreq_from_if == `Enable) begin
-            stall <= 6'b000011;
+            stall = 6'b000011; 
         end else begin
-            stall <= 6'b000000;
+            stall = 6'b000000;
         end
     end
 endmodule

@@ -13,13 +13,28 @@ module if_id(
     output reg[`InstBus] id_inst
     );
     
+    reg[`InstAddrBus] lock_pc;
+    reg[`InstBus] lock_inst;
+
     always @ (posedge clk) begin
-        if (rst == `Enable || br || (stall[1] == `Enable && stall[2] == `Disable)) begin
-            id_pc = `ZeroWord;
+        if (rst == `Enable || br) begin
+            id_pc <= `ZeroWord;
             id_inst <=`ZeroWord;
-        end else if (stall[1] == `Disable) begin
-            id_pc <= if_pc;
-            id_inst <= if_inst;
+            // lock_pc <= `ZeroWord;
+            // lock_inst <= `ZeroWord;
+        end else if (stall[2] == `Disable) begin
+            // if (lock_inst) begin
+            //     // id_pc <= lock_pc;
+            //     // id_inst <= lock_inst;
+            //     // lock_pc <= `ZeroWord;
+            //     // lock_inst <= `ZeroWord;
+            // end else begin
+                id_pc <= if_pc;
+                id_inst <= if_inst;
+            // end
+        end else if (if_inst) begin
+            // lock_pc <= if_pc;
+            // lock_inst <= if_inst;
         end
     end
 endmodule

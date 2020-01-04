@@ -56,10 +56,10 @@
 `define SEL_SB              5'b11111
 `define SEL_SH              5'b11110
 `define SEL_SW              5'b11011
-
+// `define SEL_NOP             5'b00000
 //AluSel
 `define EXE_RES_LOGIC 3'b001
-`define EXE_RES_NOP 3'b000
+`define EXE_RES_NOP 5'b10010
 
 `define InstAddrBus 31:0    //ROM address width
 `define AddrBus 31:0

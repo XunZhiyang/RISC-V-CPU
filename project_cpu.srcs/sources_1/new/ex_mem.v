@@ -29,7 +29,7 @@ module ex_mem (
 
 
     always @ (posedge clk) begin
-        if (rst == `Enable || (stall[3] == 1'b1 && stall[4] == 1'b0)) begin
+        if (rst == `Enable) begin
             pc_o <= `ZeroWord;
             mem_wd <= `NOPRegAddr;
             mem_wreg <= `Disable;
@@ -38,7 +38,7 @@ module ex_mem (
             mem_rw <= 1'b0;
             mem_byte_num <= 2'b00;
             mem_sign <= 1'b0;
-        end else if (stall[3] == 1'b0) begin
+        end else if (stall[4] == 1'b0) begin
             pc_o <= pc_i;
             mem_wd <= ex_wd;
             mem_wreg <= ex_wreg;

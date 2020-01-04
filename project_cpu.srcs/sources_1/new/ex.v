@@ -10,9 +10,10 @@ module ex(
     input wire[`RegBus] reg2_i,
     input wire[`RegAddrBus] wd_i,
     input wire wreg_i,
+    input wire addi,
 
     input wire[`RegBus] imm,
-    input wire func7,
+    // input wire imm[10],
 
     output reg[`RegAddrBus] wd_o,
     output reg wreg_o,
@@ -45,171 +46,182 @@ module ex(
 
     always @ (*) begin
         if (rst == `Enable) begin
-            pc_o <= `ZeroWord;
-            br <= 1'b0;
-            wd_o <= `NOPRegAddr;     //wht not in pdf
-            wreg_o <= `Disable;
-            byte_num_o <= 2'b00;
-            wdata_o <= `ZeroWord;
+            pc_o = `ZeroWord;
+            br = 1'b0;
+            wd_o = `NOPRegAddr;     //wht not in pdf
+            wreg_o = `Disable;
+            byte_num_o = 2'b00;
+            npc = 0;
+            wdata_o = `ZeroWord;
+            mem_data_addr = 0;
+            mem_rw = 0;
+            sign_o = 0;
         end else begin
-            pc_o <= pc_i;
-            br <= 1'b0;
-            wd_o <= wd_i;
-            wreg_o <= wreg_i;
-            byte_num_o <= 2'b00;
-            wdata_o <= `ZeroWord;
+            pc_o = pc_i;
+            br = 1'b0;
+            wd_o = wd_i;
+            wreg_o = wreg_i;
+            byte_num_o = 2'b00;
+            wdata_o = `ZeroWord;
+            npc = 0;
+            mem_data_addr = 0;
+            mem_rw = 0;
+            sign_o = 0;
             case(alusel_i)
                 `SEL_OR: begin
-                    wdata_o <= reg1_i | reg2_i;
+                    wdata_o = reg1_i | reg2_i;
                 end
                 `SEL_AND: begin
-                    wdata_o <= reg1_i & reg2_i;
+                    wdata_o = reg1_i & reg2_i;
                 end
                 `SEL_XOR: begin
-                    wdata_o <= reg1_i ^ reg2_i;
+                    wdata_o = reg1_i ^ reg2_i;
                 end
                 `SEL_ADD: begin
-                    if (func7 == 0) wdata_o <= reg1_i + reg2_i;
-                    else wdata_o <= reg1_i - reg2_i;
+                    if (imm[10] == 0 || addi) wdata_o = reg1_i + reg2_i;
+                    else wdata_o = reg1_i - reg2_i;
                 end
                 `SEL_SLT: begin
                     if ($signed(reg1_i) < $signed(reg2_i)) 
-                        wdata_o <= 1;
-                    else wdata_o <= 0;
+                        wdata_o = 1;
+                    else wdata_o = 0;
                 end
                 `SEL_SLTU: begin
-                    if (reg1_i < reg2_i) wdata_o <= reg1_i;
-                    else wdata_o <= 0;
+                    if (reg1_i < reg2_i) wdata_o = reg1_i;
+                    else wdata_o = 0;
                 end
                 `SEL_SLL: begin
-                    wdata_o <= reg1_i << reg2_i[4:0];
+                    wdata_o = reg1_i << reg2_i[4:0];
                 end
                 `SEL_SRL: begin
-                    if (func7 == 1'b0)
-                        wdata_o <= reg1_i >> reg2_i[4:0];
+                    if (imm[10] == 1'b0)
+                        wdata_o = reg1_i >> reg2_i[4:0];
                     else
-                        wdata_o <= $signed(reg1_i) >>> reg2_i[4:0];
+                        wdata_o = $signed(reg1_i) >>> reg2_i[4:0];
                 end
                 `SEL_LUI: begin
-                    wdata_o <= reg1_i;
+                    wdata_o = reg1_i;
                 end
                 `SEL_AUIPC: begin
-                    wdata_o <= reg1_i + pc_i;
+                    wdata_o = reg1_i + pc_i;
                 end
                 `SEL_JAL: begin
-                    $display("i'm in SEL_JAL");
-                    wdata_o <= pc_i + 4;
-                    npc <= reg1_i + pc_i;
-                    br <= 1'b1;
+                    // $display("i'm in SEL_JAL");
+                    wdata_o = pc_i + 4;
+                    npc = reg1_i + pc_i;
+                    br = 1'b1;
                 end
                 `SEL_JALR: begin
-                    wdata_o <= pc_i + 4;
-                    npc <= (reg1_i + reg2_i) & (-2);
-                    br <= 1'b1;
+                    wdata_o = pc_i + 4;
+                    npc = (reg1_i + reg2_i) & (-2);
+                    br = 1'b1;
                 end
                 `SEL_BEQ: begin
-                    wdata_o <= 0;
+                    wdata_o = 0;
                     if (reg1_i == reg2_i) begin
-                        npc <= imm + pc_i;
-                        br <= 1'b1;
+                        npc = imm + pc_i;
+                        br = 1'b1;
                     end
                 end
                 `SEL_BNE: begin
-                    wdata_o <= 0;
+                    wdata_o = 0;
                     if (reg1_i != reg2_i) begin
-                        npc <= imm + pc_i;
-                        br <= 1'b1;
+                        npc = imm + pc_i;
+                        br = 1'b1;
                     end
                 end
                 `SEL_BLTU: begin
-                    wdata_o <= 0;
+                    wdata_o = 0;
                     if (reg1_i < reg2_i) begin
-                        npc <= imm + pc_i;
-                        br <= 1'b1;
+                        npc = imm + pc_i;
+                        br = 1'b1;
                     end
                 end
                 `SEL_BGEU: begin
-                    wdata_o <= 0;
+                    wdata_o = 0;
                     if (reg1_i >= reg2_i) begin
-                        npc <= imm + pc_i;
-                        br <= 1'b1;
+                        npc = imm + pc_i;
+                        br = 1'b1;
                     end
                 end
                 `SEL_BLT: begin
-                    wdata_o <= 0;
+                    wdata_o = 0;
                     if ($signed(reg1_i) < $signed(reg2_i)) begin
-                        npc <= imm + pc_i;
-                        br <= 1'b1;
+                        npc = imm + pc_i;
+                        br = 1'b1;
                     end
                 end
                 `SEL_BGE: begin
-                    wdata_o <= 0;
+                    wdata_o = 0;
                     if ($signed(reg1_i) >= $signed(reg2_i)) begin
-                        npc <= imm + pc_i;
-                        br <= 1'b1;
+                        npc = imm + pc_i;
+                        br = 1'b1;
                     end
                 end
                 `SEL_LB: begin
-                    mem_data_addr <= reg1_i + reg2_i;
-                    mem_rw <= `MemRead;
-                    byte_num_o <= 3'b001;
-                    sign_o <= 1;
+                    mem_data_addr = reg1_i + reg2_i;
+                    mem_rw = `MemRead;
+                    byte_num_o = 3'b001;
+                    sign_o = 1;
                 end
                 `SEL_LH: begin
-                    mem_data_addr <= reg1_i + reg2_i;
-                    mem_rw <= `MemRead;
-                    byte_num_o <= 3'b010;
-                    sign_o <= 1;
+                    mem_data_addr = reg1_i + reg2_i;
+                    mem_rw = `MemRead;
+                    byte_num_o = 3'b010;
+                    sign_o = 1;
                 end
                 `SEL_LW: begin
-                    mem_data_addr <= reg1_i + reg2_i;
-                    mem_rw <= `MemRead;
-                    byte_num_o <= 3'b100;
-                    sign_o <= 1;
+                    mem_data_addr = reg1_i + reg2_i;
+                    mem_rw = `MemRead;
+                    byte_num_o = 3'b100;
+                    sign_o = 1;
                 end
                 `SEL_LBU: begin
-                    mem_data_addr <= reg1_i + reg2_i;
-                    mem_rw <= `MemRead;
-                    byte_num_o <= 3'b001;
-                    sign_o <= 0;
+                    mem_data_addr = reg1_i + reg2_i;
+                    mem_rw = `MemRead;
+                    byte_num_o = 3'b001;
+                    sign_o = 0;
                 end
                 `SEL_LHU: begin
-                    mem_data_addr <= reg1_i + reg2_i;
-                    mem_rw <= `MemRead;
-                    byte_num_o <= 3'b010;
-                    sign_o <= 0;
+                    mem_data_addr = reg1_i + reg2_i;
+                    mem_rw = `MemRead;
+                    byte_num_o = 3'b010;
+                    sign_o = 0;
                 end
                 `SEL_SB: begin
-                    wdata_o <= reg2_i;
-                    mem_data_addr <= reg1_i + imm;
-                    mem_rw <= `MemWrite;
-                    byte_num_o <= 3'b001;
+                    wdata_o = reg2_i;
+                    mem_data_addr = reg1_i + imm;
+                    mem_rw = `MemWrite;
+                    byte_num_o = 3'b001;
                 end
                 `SEL_SH: begin
-                    wdata_o <= reg2_i;
-                    mem_data_addr <= reg1_i + imm;
-                    mem_rw <= `MemWrite;
-                    byte_num_o <= 3'b010;
+                    wdata_o = reg2_i;
+                    mem_data_addr = reg1_i + imm;
+                    mem_rw = `MemWrite;
+                    byte_num_o = 3'b010;
                 end
                 `SEL_SW: begin
-                    wdata_o <= reg2_i;
-                    mem_data_addr <= reg1_i + imm;
-                    mem_rw <= `MemWrite;
-                    byte_num_o <= 3'b100;
+                    wdata_o = reg2_i;
+                    mem_data_addr = reg1_i + imm;
+                    mem_rw = `MemWrite;
+                    byte_num_o = 3'b100;
+                end
+                default: begin
+                    wdata_o = 0;
                 end
             endcase
         end
     end
 
     // always @ (*) begin
-    //     wd_o <= wd_i;
-    //     wreg_o <= wreg_i;
+    //     wd_o = wd_i;
+    //     wreg_o = wreg_i;
     //     case (alusel_i)
     //         `EXE_RES_LOGIC: begin
-    //             wdata_o <= wdata_o;
+    //             wdata_o = wdata_o;
     //         end
     //         default: begin
-    //             wdata_o <= `ZeroWord;
+    //             wdata_o = `ZeroWord;
     //         end
     //     endcase
     // end
