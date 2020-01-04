@@ -1,10 +1,10 @@
 -- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2019.1 (win64) Build 2552052 Fri May 24 14:49:42 MDT 2019
--- Date        : Sat Jan  4 13:30:51 2020
+-- Date        : Sat Jan  4 16:12:18 2020
 -- Host        : LAPTOP-DP9ILB3A running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode synth_stub
---               d:/CA/CPU/project_cpu/project_cpu.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0_stub.vhdl
+--               D:/CA/CPU/project_cpu/project_cpu.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0_stub.vhdl
 -- Design      : clk_wiz_0
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xc7a35tcpg236-1

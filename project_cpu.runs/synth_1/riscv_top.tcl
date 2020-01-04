@@ -19,7 +19,6 @@ proc create_report { reportName command } {
 }
 set_param chipscope.maxJobs 2
 set_param xicom.use_bs_reader 1
-set_msg_config -id {Common 17-41} -limit 10000000
 create_project -in_memory -part xc7a35tcpg236-1
 
 set_param project.singleFileAddWarning.threshold 0
@@ -58,7 +57,7 @@ read_verilog -library xil_defaultlib {
   D:/CA/CPU/project_cpu/project_cpu.srcs/sources_1/common/uart/uart_tx.v
   D:/CA/CPU/project_cpu/project_cpu.srcs/sources_1/new/riscv_top.v
 }
-read_ip -quiet d:/CA/CPU/project_cpu/project_cpu.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci
+read_ip -quiet D:/CA/CPU/project_cpu/project_cpu.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci
 set_property used_in_implementation false [get_files -all d:/CA/CPU/project_cpu/project_cpu.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0_board.xdc]
 set_property used_in_implementation false [get_files -all d:/CA/CPU/project_cpu/project_cpu.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xdc]
 set_property used_in_implementation false [get_files -all d:/CA/CPU/project_cpu/project_cpu.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0_ooc.xdc]
@@ -77,7 +76,7 @@ set_property used_in_implementation false [get_files D:/CA/CPU/project_cpu/proje
 set_param ips.enableIPCacheLiteLoad 1
 close [open __synthesis_is_running__ w]
 
-synth_design -top riscv_top -part xc7a35tcpg236-1 -fanout_limit 600
+synth_design -top riscv_top -part xc7a35tcpg236-1
 
 
 # disable binary constraint mode for synth run checkpoints
